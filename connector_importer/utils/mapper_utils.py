@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Author: Simone Orsi
 # Copyright 2017 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
@@ -29,7 +28,7 @@ def to_date(value, formats=FMTS):
             break
         except ValueError:
             pass
-    if not isinstance(value, basestring):
+    if not isinstance(value, str):
         try:
             return fields.Date.to_string(value)
         except ValueError:
@@ -52,7 +51,7 @@ def to_utc_datetime(orig_value, tz='Europe/Rome'):
             break
         except ValueError:
             pass
-    if not isinstance(value, basestring):
+    if not isinstance(value, str):
         return fields.Datetime.to_string(value)
     # the value has not been converted,
     # maybe because is like 00/00/0000
@@ -259,7 +258,7 @@ def backend_to_rel(field,
                     value = create_missing_handler(self, rel_model, record)
                 else:
                     value = rel_model.create({'name': record[field]})
-            except Exception, e:
+            except Exception as e:
                 msg = (
                     '`backend_to_rel` failed creation. '
                     '[model: %s] [line: %s] [to_attr: %s] '

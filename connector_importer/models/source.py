@@ -5,7 +5,7 @@
 
 from odoo import models, fields, api, tools
 
-from ..utils.importer_utils import gen_chunks, CSVReader, guess_csv_metadata
+from ..utils.import_utils import gen_chunks, CSVReader, guess_csv_metadata
 
 
 class ImportSourceConsumerdMixin(models.AbstractModel):

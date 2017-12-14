@@ -3,11 +3,14 @@
 # Copyright 2017 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
+from odoo.addons.component.core import AbstractComponent
+from odoo.addons.connector.components.mapper import mapping
 
-from openerp.addons.connector.unit.mapper import ImportMapper, mapping
 
-
-class BaseImportMapper(ImportMapper):
+class ImportMapper(AbstractComponent):
+    _name = 'importer.base.mapper'
+    _inherit = ['importer.base.component', 'base.import.mapper']
+    _usage = 'importer.mapper'
 
     required = {
         # source key: dest key
@@ -62,8 +65,20 @@ class BaseImportMapper(ImportMapper):
     defaults = [
         # odoo field, value
         # ('sale_ok', True),
+        # defaults can be also retrieved via xmlid to other records.
+        # The format is: `_xmlid::$record_xmlid::$record_field_value`
+        # whereas `$record_xmlid` is the xmlid to retrieve
+        # and ``$record_field_value` is the field to be used as value.
+        # Example:
+        # ('company_id', '_xmlid:base.main_company:id'),
     ]
 
     @mapping
     def default_values(self, record=None):
-        return dict(self.defaults)
+        values = {}
+        for k, v in self.defaults:
+            if isinstance(v, str) and v.startswith('_xmlid::'):
+                xmlid, field_value = v.split('::')[1:]
+                v = self.env.ref(xmlid)[field_value]
+            values[k] = v
+        return values

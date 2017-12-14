@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Author: Simone Orsi
 # Copyright 2017 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
@@ -85,7 +84,7 @@ class CSVReporter(models.AbstractModel):
             'group_by_status', self.report_group_by_status)
 
         model_keys = [
-            x for x in json_report.iterkeys() if not x.startswith('_')]
+            x for x in json_report.keys() if not x.startswith('_')]
 
         extra_keys = [
             self._report_make_key(x) for x in report_keys
@@ -142,8 +141,8 @@ class CSVReporter(models.AbstractModel):
 
     def _report_make_key(self, key, model=''):
         if model:
-            return u'[R] {}: {}'.format(model, key)
-        return u'[R] {}'.format(key)
+            return '[R] {}: {}'.format(model, key)
+        return '[R] {}'.format(key)
 
     def _report_group_by_line(self, json_report, model_keys, report_keys):
         """Group report items by line number.
@@ -199,7 +198,7 @@ class CSVReporter(models.AbstractModel):
             self, line, line_num, grouped, model_keys):
         """Get one column per each pair model-status."""
         for model in model_keys:
-            for status, lines in grouped.iteritems():
+            for status, lines in grouped.items():
                 # get info on current line if any
                 line_info = lines.get(line_num, {})
                 # add the extra report column anyway
@@ -209,8 +208,8 @@ class CSVReporter(models.AbstractModel):
     def _report_line_by_status(
             self, line, line_num, grouped, model_keys):
         """Get one column per each status containing all modelss messages."""
-        for status, by_line in grouped.iteritems():
+        for status, by_line in grouped.items():
             line_info = by_line.get(line_num, [])
             line[self._report_make_key(status)] = '\n'.join([
-                u'{model}: {message}'.format(**item) for item in line_info
+                '{model}: {message}'.format(**item) for item in line_info
             ])

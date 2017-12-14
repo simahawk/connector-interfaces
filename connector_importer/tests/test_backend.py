@@ -7,12 +7,15 @@
 import odoo.tests.common as common
 
 
-class TestAll(common.TransactionCase):
+class TestBackend(common.SavepointCase):
 
-    def setUp(self):
-        super(TestAll, self).setUp()
-        self.backend_model = self.env['importer.backend']
+    @classmethod
+    def setUpClass(cls):
+        super().setUp()
+        cls.backend_model = cls.env['import.backend']
 
     def test_backend_create(self):
-        b1 = self.backend_model.create({})
+        b1 = self.backend_model.create({
+            'version': '1.0',
+        })
         self.assertTrue(b1)

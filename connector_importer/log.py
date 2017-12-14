@@ -7,12 +7,13 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 
-logger = logging.getLogger('[importer]')
+LOGGER_NAME = '[importer]'
+logger = logging.getLogger(LOGGER_NAME)
 logger.setLevel(logging.INFO)
 
-if os.environ.get('IMPORTER_LOG_PATH'):
+if os.getenv('IMPORTER_LOG_PATH'):
     # use separated log file when developing
-    FNAME = 'importer.log'
+    FNAME = 'import.log'
 
     base_path = os.environ.get('IMPORTER_LOG_PATH')
     if not os.path.exists(base_path):

@@ -114,7 +114,7 @@ class Reporter(object):
         # start date
         self._add(self._value_line('Last start', self._data['last_start']))
         # global counters
-        summary_items = self._data['last_summary'].items()
+        summary_items = list(self._data['last_summary'].items())
         for key, value in summary_items:
             last = key == summary_items[-1][0]
             self._add(self._value(key, value) + (' - ' if not last else ''))
@@ -137,4 +137,4 @@ class Reporter(object):
 
 if __name__ == '__main__':
     reporter = Reporter(JSONDATA, detailed=1)
-    print reporter.html()
+    print(reporter.html())
