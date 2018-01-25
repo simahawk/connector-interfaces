@@ -31,7 +31,7 @@ class ChunkReport(dict):
 
     def counters(self):
         res = {}
-        for k, v in list(self.items()):
+        for k, v in self.items():
             res[k] = len(v)
         return res
 

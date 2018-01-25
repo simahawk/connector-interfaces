@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-##############################################################################
-#
-#    Copyright (C) 2017 Camptocamp (<http://www.camptocamp.com>)
-#
-##############################################################################
-
 from odoo import fields
 from odoo import models
 

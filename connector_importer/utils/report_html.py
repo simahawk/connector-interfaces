@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Author: Simone Orsi
 # Copyright 2017 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
@@ -114,7 +113,7 @@ class Reporter(object):
         # start date
         self._add(self._value_line('Last start', self._data['last_start']))
         # global counters
-        summary_items = list(self._data['last_summary'].items())
+        summary_items = self._data['last_summary'].items()
         for key, value in summary_items:
             last = key == summary_items[-1][0]
             self._add(self._value(key, value) + (' - ' if not last else ''))
