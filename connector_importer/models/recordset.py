@@ -15,6 +15,29 @@ from ..log import logger
 
 
 class ImportRecordSet(models.Model, JobRelatedMixin):
+    """Set of records, together with their configuration.
+
+    A recordset can be considered as an "import session".
+    Here you declare:
+
+    * what you want to import (via "Import type")
+    * where you get records from (via "Source" configuration)
+
+    A recordset is also responsible to hold and display some meaningful
+    information about imports:
+
+    * required fields, translatable fields, defaults
+    * import stats (created|updated|skipped|errored counters, latest run)
+    * fully customizable HTML report to provide more details
+    * downloadable report file (via reporters)
+    * global states of running jobs
+
+    When you run the import of a recordset this is what happens:
+
+    * asks the source to provide all the records (chunked)
+    * creates and import record for each chunk
+    * schedule the import job for each record
+    """
     _name = 'import.recordset'
     _inherit = 'import.source.consumer.mixin'
     _description = 'Import recordset'
@@ -37,6 +60,8 @@ class ImportRecordSet(models.Model, JobRelatedMixin):
     )
     override_existing = fields.Boolean(
         string='Override existing items',
+        help='Enable to update existing items w/ new values. '
+             'If disabled, matching records will be skipped.',
         default=True,
     )
     name = fields.Char(

@@ -8,7 +8,7 @@ from ..utils.report_html import Reporter
 
 
 class ReportController(http.Controller):
-    """Controller for display import reports."""
+    """Controller to display import reports."""
 
     @http.route(
         '/importer/import-recordset/<model("import.recordset"):recordset>',

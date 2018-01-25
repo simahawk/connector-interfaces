@@ -13,6 +13,23 @@ from ..log import logger
 
 
 class ImportRecord(models.Model, JobRelatedMixin):
+    """Data to be imported.
+
+    An import record contains what you are actually importing.
+
+    Depending on backend settings you gonna have one or more source records
+    stored as JSON data into `jsondata` field.
+
+    No matter where you are importing from (CSV, SQL, etc)
+    the importer machinery will:
+
+    * retrieve the models to import and their importer
+    * process all records and import them
+    * update recordset info
+
+    When the importer will run, it will read all the records,
+    convert them using connector mappers and do the import.
+    """
     _name = 'import.record'
     _description = 'Import record'
     _order = 'date DESC'

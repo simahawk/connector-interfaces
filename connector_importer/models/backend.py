@@ -37,7 +37,7 @@ class ImporterBackend(models.Model):
     recordset_ids = fields.One2many(
         'import.recordset',
         'backend_id',
-        string='Record Sets',
+        string='Record Sets'
     )
     # cron stuff
     cron_master_recordset_id = fields.Many2one(
@@ -77,15 +77,13 @@ class ImporterBackend(models.Model):
 
     @api.multi
     def unlink(self):
+        """Prevent delete if jobs are running."""
         for item in self:
             item.check_delete()
         return super(ImporterBackend, self).unlink()
 
-    @api.model
+    @api.multi
     def check_delete(self):
-        """ if debug mode is not ON check that we don't have
-        any jobs related to our sub records.
-        """
         if not self.debug_mode and self.job_running:
             raise exceptions.Warning(_('You must complete the job first!'))
 
@@ -121,6 +119,15 @@ class ImporterBackend(models.Model):
 
     @api.model
     def cron_cleanup_recordsets(self):
+        """Delete obsolete recordsets.
+
+        If you are running imports via cron and you create one recorset
+        per each run then you might end up w/ tons of old recordsets.
+
+        You can use `cron_cleanup_keep` to enable auto-cleanup.
+        Here we lookup for backends w/ this settings
+        and keep only latest recordsets.
+        """
         cleanup_logger.info('Looking for recorsets to cleanup.')
         backends = self.search([('cron_cleanup_keep', '>', 0)])
         to_clean = self.env['import.recordset']

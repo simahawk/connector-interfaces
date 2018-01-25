@@ -16,6 +16,16 @@ class RecordSetImporter(Component):
     _apply_on = 'import.recordset'
 
     def run(self, recordset, **kw):
+        """Run recordset job.
+
+        Steps:
+
+        * update last start date on recordset
+        * read source
+        * process all source lines in chunks
+        * create an import record per each chunk
+        * schedule import for each record
+        """
         # update recordset report
         recordset.set_report({
             '_last_start': fields.Datetime.now(),
@@ -36,7 +46,13 @@ class RecordSetImporter(Component):
 
 
 class RecordImporter(AbstractComponent):
-    """Importer for records."""
+    """Importer for records.
+
+    This importer is actually the one that does the real import work.
+    It loads each import records and tries to import them
+    and keep tracks of errored, skipped, etc.
+    See `run` method for detailed information on what it does.
+    """
 
     _name = 'importer.record'
     _inherit = ['importer.base.component']
@@ -45,10 +61,12 @@ class RecordImporter(AbstractComponent):
     # log and report errors
     # do not make the whole import fail
     _break_on_error = False
+    # a unique key (field name) to retrieve the odoo record
     odoo_unique_key = ''
 
     def _init_importer(self, recordset):
         self.recordset = recordset
+        # record handler is responsible for create/write on odoo records
         self.record_handler = self.component_by_name(
             'importer.odoorecord.handler',
             model_name=self.model._name,
@@ -57,6 +75,7 @@ class RecordImporter(AbstractComponent):
             importer=self,
             unique_key=self.odoo_unique_key
         )
+        # tracking handler is responsible for logging and chunk reports
         self.tracker = self.component_by_name(
             'importer.tracking.handler',
             model_name=self.model._name,
@@ -112,7 +131,7 @@ class RecordImporter(AbstractComponent):
     def collect_translatable(self, values, orig_values):
         """Get translations values for `mapper.translatable_keys`.
 
-        We assume that the source contains extra columns in the form:
+        We assume that the source contains translatable columns in the form:
 
             `mapper_key:lang`
 
@@ -195,6 +214,7 @@ class RecordImporter(AbstractComponent):
         # we cannot alter dict keys while iterating
         res = {}
         for k, v in line.items():
+            # skip internal tech keys if any
             if not k.startswith('_'):
                 k = self.clean_line_key(k)
             if isinstance(v, str):
@@ -214,24 +234,48 @@ class RecordImporter(AbstractComponent):
         return key.strip()
 
     def prepare_line(self, line):
-        """Pre-manipulate a line if needed."""
-        pass
+        """Pre-manipulate a line if needed.
+
+        For instance: you might want to fix some field names.
+        Sometimes in CSV you have mispelled names
+        (upper/lowercase, spaces, etc) all chars that might break your mappers.
+
+        Here you can adapt the source line before the mapper is called
+        so that the logic in the mapper will be always the same.
+        """
+        return line
 
     def _do_report(self):
+        """Update recordset report using the tracker."""
         previous = self.recordset.get_report()
         report = self.tracker.get_report(previous)
         self.recordset.set_report({self.model._name: report})
 
     def _record_lines(self):
+        """Get lines from import record."""
         return self.record.get_data()
 
     def _load_mapper_options(self):
+        """Retrieve mapper options."""
         return {
             'override_existing': self.recordset.override_existing
         }
 
     def run(self, record, **kw):
-        """Run the import machinery!"""
+        """Run record job.
+
+        Steps:
+
+        * check if record is still available
+        * initialize the import
+        * read each line to be imported
+        * clean them up
+        * manipulate them (field names fixes and such)
+        * retrieve a mapper and convert values
+        * check and skip record if needed
+        * if record exists: update it, else, create it
+        * produce a report and store it on recordset
+        """
 
         self.record = record
         if not self.record:
@@ -246,7 +290,7 @@ class RecordImporter(AbstractComponent):
 
         for line in self._record_lines():
             line = self.cleanup_line(line)
-            self.prepare_line(line)
+            line = self.prepare_line(line)
 
             odoo_record = None
 

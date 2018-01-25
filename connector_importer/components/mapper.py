@@ -24,7 +24,9 @@ class ImportMapper(AbstractComponent):
         #         ('title', 'name'),
         #         (concat(('title', 'foo', ), separator=' - '), 'baz'),
         #     ]
+
         # You want the record to be skipped if:
+
         # 1. title or name are not valued in the source
         # 2. title is valued but the conversion gives an empty value for name
         # 3. title or foo are not valued in the source
@@ -38,7 +40,7 @@ class ImportMapper(AbstractComponent):
         # }
 
         # If you want to check only the source or the destination key
-        # use the same and prefix in w/ double underscore, like:
+        # use the same name and prefix it w/ double underscore, like:
 
         # {'__foo': 'baz', 'foo': '__baz'}
     }
@@ -48,6 +50,8 @@ class ImportMapper(AbstractComponent):
 
         The importer can use this to determine if a line
         has to be skipped.
+
+        The recordset will use this to show required fields to users.
         """
         return self.required
 
@@ -58,12 +62,15 @@ class ImportMapper(AbstractComponent):
 
         The importer can use this to translate specific fields
         if the are found in the csv in the form `field_name:lang_code`.
+
+        The recordset will use this to show translatable fields to users.
         """
         return self.translatable
 
     defaults = [
         # odoo field, value
         # ('sale_ok', True),
+
         # defaults can be also retrieved via xmlid to other records.
         # The format is: `_xmlid::$record_xmlid::$record_field_value`
         # whereas `$record_xmlid` is the xmlid to retrieve
@@ -74,6 +81,10 @@ class ImportMapper(AbstractComponent):
 
     @mapping
     def default_values(self, record=None):
+        """Return default values for this mapper.
+
+        The recordset will use this to show default values to users.
+        """
         values = {}
         for k, v in self.defaults:
             if isinstance(v, str) and v.startswith('_xmlid::'):

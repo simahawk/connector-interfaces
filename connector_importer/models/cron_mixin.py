@@ -6,6 +6,16 @@ from odoo import models, fields, api
 
 
 class CronMixin(models.AbstractModel):
+    """Add cron-related features to your models.
+
+    On inheriting models you can:
+
+    * enable cron mode
+    * configure a cron
+    * save and get a specific cron to run something on your model
+
+    You have to implement the method `run_cron`.
+    """
     _name = 'cron.mixin'
     _description = 'Cron Mixin'
 

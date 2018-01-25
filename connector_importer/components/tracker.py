@@ -46,6 +46,7 @@ class Tracker(AbstractComponent):
     model_name = ''
     logger_name = ''
     log_prefix = ''
+    _chunk_report_klass = ChunkReport
 
     def _init_handler(self, model_name='', logger_name='', log_prefix=''):
         self.model_name = model_name
@@ -64,7 +65,7 @@ class Tracker(AbstractComponent):
     @property
     def chunk_report(self):
         if not self._chunk_report:
-            self._chunk_report = ChunkReport()
+            self._chunk_report = self._chunk_report_klass()
         return self._chunk_report
 
     def chunk_report_item(self, line, odoo_record=None, message=''):
@@ -117,7 +118,7 @@ class Tracker(AbstractComponent):
     def get_report(self, previous=None):
         previous = previous or {}
         # init a new report
-        report = ChunkReport()
+        report = self._chunk_report_klass()
         # merge previous and current
         for k, v in report.items():
             prev = previous.get(self.model_name, {}).get(k, [])

@@ -3,18 +3,28 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 
-from openerp import models
+from odoo import models, api
 import csv
 import io
 import time
 
 
 class ReporterMixin(models.AbstractModel):
+    """Base mixin for reporters.
+
+    A reporter can be used to produce a file with a summary of the import
+    that the user can generate and download on each recordset.
+
+    The summary can be anything you like: you are in total control of it.
+    See the CSV example for a real case.
+    """
     _name = 'reporter.mixin'
 
     report_extension = '.txt'
 
+    @api.model
     def report_get(self, recordset, **options):
+        """Create and return a report for given recordset."""
         fileout = io.BytesIO()
         self.report_do(recordset, fileout, **options)
         self.report_finalize(recordset, fileout, **options)
@@ -22,12 +32,14 @@ class ReporterMixin(models.AbstractModel):
         return metadata, fileout.getvalue()
 
     def report_do(self, recordset, fileout, **options):
+        """Override me to generate the report."""
         raise NotImplementedError()
 
     def report_finalize(self, recordset, fileout, **options):
         """Apply late updates to report."""
 
     def report_get_metadata(self, recordset, **options):
+        """Retrieve report file's metadata."""
         fname = str(time.time())
         ext = self.report_extension
         return {
@@ -38,15 +50,39 @@ class ReporterMixin(models.AbstractModel):
 
 
 class CSVReporter(models.AbstractModel):
-    """Produce a CSV feed."""
+    """Produce a CSV report.
+
+    Very often is not easy to let the customer know what went wrong.
+    Here a CSV report is generated based on the initial CSV
+    provided by the customer/user.
+
+    Basically we:
+
+    * compute the stats of errored and skipped _get_lines
+    * clone the original CSV file
+    * add new columns at the end
+
+    The new columns number is controlled by the flag `report_group_by_status`:
+
+    * True: 2 new columns per each model imported. For instance:
+        * [R] res.partner skipped
+        * [R] res.partner errored
+        * [R] res.partner.category skipped
+        * [R] res.partner.category errored
+    * False: errors are grouped by state in 2 columns:
+        * [R] skipped
+        * [R] errored
+
+    In this way the end user can check side by side which lines went wrong.
+    """
     _name = 'reporter.csv'
     _inherit = 'reporter.mixin'
 
     report_extension = '.csv'
+    # columns to track/add
     report_keys = ['skipped', 'errored']
-    # flag to determine if status report
-    # must be grouped by status.
-    # If `True` report result will be merged by status (errored, skippeed, ...)
+    # Flag to determine if status report must be grouped by status.
+    # If `True` report result will be merged by status (errored, skipped, ...)
     report_group_by_status = True
 
     def report_get_writer(self, fileout, columns,

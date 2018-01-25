@@ -36,20 +36,22 @@ class CSVSource(models.Model):
     @property
     def _config_summary_fields(self):
         _fields = super()._config_summary_fields
-        return _fields + (
+        return _fields + [
             'csv_filename', 'csv_filesize',
             'csv_delimiter', 'csv_quotechar',
-        )
+        ]
 
     @api.onchange('csv_file')
     def _onchance_csv_file(self):
         if self.csv_file:
+            # auto-guess CSV details
             meta = guess_csv_metadata(self.csv_file.decode('base64'))
             if meta:
                 self.csv_delimiter = meta['delimiter']
                 self.csv_quotechar = meta['quotechar']
 
     def _filesize_human(self, size, suffix='B'):
+        """Convert size to human."""
         for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
             if abs(size) < 1024.0:
                 return "%3.1f%s%s" % (size, unit, suffix)
@@ -100,7 +102,8 @@ class CSVSource(models.Model):
     #             self.import_type_id.key)
     #     return self.env.ref(xmlid, raise_if_not_found=0)
     #
-    # @api.depends('backend_id.version', 'import_type_id', 'example_file_xmlid')
+    # @api.depends(
+    # 'backend_id.version', 'import_type_id', 'example_file_xmlid')
     # def _compute_example_file_url(self):
     #     att = self._get_example_attachment()
     #     if att:

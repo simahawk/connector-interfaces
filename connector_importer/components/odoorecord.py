@@ -19,9 +19,6 @@ class OdooRecordHandler(AbstractComponent):
         self.importer = importer
         self.unique_key = unique_key
 
-    def set_importer(self, _importer):
-        self._importer = _importer
-
     def odoo_find_domain(self, values, orig_values):
         """Domain to find the record in odoo."""
         return [(self.unique_key, '=', values[self.unique_key])]
@@ -38,17 +35,18 @@ class OdooRecordHandler(AbstractComponent):
         return bool(self.odoo_find(values, orig_values))
 
     def update_translations(self, odoo_record, translatable, ctx=None):
+        """Write translations on given record."""
         ctx = ctx or {}
         for lang, values in translatable.items():
             odoo_record.with_context(
                 lang=lang, **self.write_context()).write(values)
 
     def odoo_pre_create(self, values, orig_values):
-        """Do some extra stuff before creating a missing object."""
+        """Do some extra stuff before creating a missing record."""
         pass
 
     def odoo_post_create(self, odoo_record, values, orig_values):
-        """Do some extra stuff after creating a missing object."""
+        """Do some extra stuff after creating a missing record."""
         pass
 
     def create_context(self):
