@@ -145,6 +145,12 @@ class ImportRecordset(models.Model, JobRelatedMixin):
         """Update import report values."""
         self.ensure_one()
         self._set_serialized('shared_data', values, reset=reset)
+        # Without invalidating cache we will have a bug because of Serialized
+        # field in odoo. It uses json.loads on convert_to_cache, which leads
+        # to all of our int dict keys converted to strings. Except for the
+        # first value get, where we get not from cache yet. So in order to
+        # streamline this I invalidate cache right away and use string keys
+        self.invalidate_cache(('shared_data',))
 
     @api.multi
     def get_shared(self):
