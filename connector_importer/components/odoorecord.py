@@ -109,7 +109,7 @@ class OdooRecordHandler(Component):
 
     def _force_value(self, record, values, fname):
         self.env.cr.execute(
-            'UPDATE {} SET {} = %s WHERE id = %s'.format(record._table, fname),
-            (values[fname], record.id, )
+            'UPDATE %s SET %s = %s WHERE id = %s',
+            (record._table, fname, values[fname], record.id, )
         )
         record.invalidate_cache([fname, ])

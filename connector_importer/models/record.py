@@ -83,7 +83,7 @@ class ImportRecord(models.Model, JobRelatedMixin):
             os.environ.get('IMPORTER_DEBUG_MODE')
 
     @api.multi
-    @job
+    @job(default_channel='root.import')
     def import_record(self, component_name, model_name):
         """This job will import a record."""
         with self.backend_id.work_on(self._name) as work:

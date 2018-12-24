@@ -2,7 +2,6 @@
 # Copyright 2018 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
-import json
 import base64
 import os
 from collections import OrderedDict
@@ -240,7 +239,7 @@ class ImportRecordset(models.Model, JobRelatedMixin):
         return self.import_type_id.available_models()
 
     @api.multi
-    @job
+    @job(default_channel='root.import')
     def import_recordset(self):
         """This job will import a recordset."""
         with self.backend_id.work_on(self._name) as work:
