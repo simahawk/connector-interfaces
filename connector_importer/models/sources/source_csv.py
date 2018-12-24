@@ -68,7 +68,7 @@ class CSVSource(models.Model):
         for item in self:
             if item.csv_file:
                 item.csv_filesize = self._filesize_human(
-                    len(item._binary_csv_content()))
+                    len(item.csv_file))
 
     def _get_lines(self):
         # read CSV
