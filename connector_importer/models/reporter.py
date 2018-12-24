@@ -7,6 +7,7 @@ from odoo import models, api
 import csv
 import io
 import time
+import base64
 
 
 class ReporterMixin(models.AbstractModel):
