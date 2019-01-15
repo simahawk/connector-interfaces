@@ -257,6 +257,10 @@ class RecordImporter(Component):
             'override_existing': self.recordset.override_existing
         }
 
+    def _load_event_options(self):
+        """Retrieve event options."""
+        return {}
+
     # TODO: make these contexts customizable via recordset settings
     def _odoo_create_context(self):
         """Inject context variables on create, merged by odoorecord handler."""
@@ -346,17 +350,9 @@ class RecordImporter(Component):
         ]).format(**self.tracker.get_counters())
         self.tracker._log(msg)
 
-        # TODO
-        # chunk_finished_event.fire(
-        #     self.env, self.model._name, self.record)
+        self.record._event('on_record_chunk_finished').notify(
+            self.record,
+            is_last_importer=is_last_importer,
+            options=self._load_event_options(),
+        )
         return 'ok'
-
-    # TODO
-    def after_all(self, recordset):
-        """Get something done after all the children jobs have completed.
-
-        This should be triggered by `chunk_finished_event`.
-        """
-        # TODO: needed for logger and other stuff. Can be simplified.
-        # self._init_importer(recordset)
-        pass

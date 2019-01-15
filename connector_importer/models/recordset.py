@@ -316,19 +316,3 @@ class ImportRecordset(models.Model, JobRelatedMixin):
                 'importers': importers,
             }
             item.docs_html = template.render(data)
-
-
-# TODO
-# @job
-# def import_record_after_all(
-#         session, backend_id, model_name, last_record_id=None, **kw):
-#     """This job will import a record."""
-#     # TODO: check this
-#     model = 'import.record'
-#     env = get_environment(session, model, backend_id)
-#     # recordset = None
-#     # if last_record_id:
-#     #     record = env[model].browse(last_record_id)
-#     #     recordset = record.recordset_id
-#     importer = get_record_importer(env)
-#     return importer.after_all()
