@@ -58,7 +58,7 @@ class OdooRecordHandler(Component):
 
     def create_context(self):
         """Inject context variables on create."""
-        return {}
+        return self.importer._odoo_create_context()
 
     def odoo_create(self, values, orig_values):
         """Create a new odoo record."""
@@ -87,7 +87,7 @@ class OdooRecordHandler(Component):
 
     def write_context(self):
         """Inject context variables on write."""
-        return {}
+        return self.importer._odoo_write_context()
 
     def odoo_write(self, values, orig_values):
         """Update an existing odoo record."""
