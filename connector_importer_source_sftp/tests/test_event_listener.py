@@ -9,9 +9,7 @@ import mock
 
 from odoo.tools import mute_logger
 
-from odoo.addons.connector_importer.tests.common import TestImporterBase
-
-from .common import TestSourceCSVSFTPMixin
+from .common import SFTPSourceSavepointComponentRegistryCase
 
 MOD_PATH = "odoo.addons.connector_importer_source_sftp"
 EVENT_LISTENER_PATH = (
@@ -20,27 +18,24 @@ EVENT_LISTENER_PATH = (
 SOURCE_MODEL_PATH = MOD_PATH + ".models.source_csv_sftp.ImportSourceCSVSFTP"
 
 
-class TestRecordImporterFinishedEvent(TestImporterBase, TestSourceCSVSFTPMixin):
+class TestRecordImporterFinishedEvent(SFTPSourceSavepointComponentRegistryCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls._setup_source_records()
         cls.fake_lines = cls._fake_lines(cls, 10, keys=("id", "fullname"))
 
     def setUp(self):
         super().setUp()
-        # self.comp_registry.load_components("component_event")
-        # self.comp_registry.load_components("connector_importer_source_sftp")
         self._setup_components()
         # Not sure why but this write gets lost if done in setUpClass :/
         # Probably depends on server env override?
-        self.source.write(
-            {
-                "sftp_path_input": "input",
-                "sftp_path_error": "error",
-                "sftp_path_success": "success",
-            }
-        )
+        # self.source.write(
+        #     {
+        #         "sftp_path_input": "input",
+        #         "sftp_path_error": "error",
+        #         "sftp_path_success": "success",
+        #     }
+        # )
         self.recordset.write(
             {"source_model": "import.source.csv.sftp", "source_id": self.source.id}
         )

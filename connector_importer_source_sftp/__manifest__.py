@@ -17,4 +17,5 @@
         "storage_backend_sftp",
     ],
     "data": ["views/source_csv_sftp.xml", "security/ir.model.access.csv"],
+    "demo": ["demo/storage_backend_demo.xml", "demo/import_source_demo.xml"],
 }

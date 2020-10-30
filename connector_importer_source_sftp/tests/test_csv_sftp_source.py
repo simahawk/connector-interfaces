@@ -11,10 +11,10 @@ from odoo.tools import mute_logger
 
 from odoo.addons.storage_backend_sftp.tests.test_sftp import PARAMIKO_PATH
 
-from .common import BaseTestSourceCSVSFTP
+from .common import SFTPSourceSavepointComponentCase
 
 
-class TestSourceCSV(BaseTestSourceCSVSFTP):
+class TestSourceCSV(SFTPSourceSavepointComponentCase):
 
     extra_fields = [
         "chunk_size",
@@ -34,7 +34,7 @@ class TestSourceCSV(BaseTestSourceCSVSFTP):
     @mute_logger("[importer]")
     def test_source_basic(self):
         source = self.source
-        self.assertEqual(source.name, "test_sftp_source")
+        self.assertEqual(source.name, "demo_source_sftp_csv")
         # move file not enabled, less fields
         self.assertItemsEqual(
             source._config_summary_fields,

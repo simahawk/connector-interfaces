@@ -64,15 +64,16 @@ class ImportSourceCSVSFTP(models.Model):
         "depending on the result of the import"
     )
 
-    @property
-    def _server_env_fields(self):
-        return {
-            "sftp_path_input": {},
-            "sftp_path_error": {},
-            "sftp_path_success": {},
-            "sftp_filename_pattern": {},
-            "move_file_after_import": {},
-        }
+    # FIXME: screws tests
+    # @property
+    # def _server_env_fields(self):
+    #     return {
+    #         "sftp_path_input": {},
+    #         "sftp_path_error": {},
+    #         "sftp_path_success": {},
+    #         "sftp_filename_pattern": {},
+    #         "move_file_after_import": {},
+    #     }
 
     @property
     def _config_summary_fields(self):
