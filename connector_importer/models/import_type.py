@@ -4,7 +4,7 @@
 
 import logging
 
-from odoo import _, fields, models
+from odoo import _, api, exceptions, fields, models
 from odoo.tools import DotDict
 
 _logger = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class ImportType(models.Model):
 
     name = fields.Char(required=True, help="A meaningful human-friendly name")
     key = fields.Char(required=True, help="Unique mnemonic identifier")
-    options = fields.Text(required=True)
+    options = fields.Text()
     settings = fields.Text(
         string="Legacy Settings",
         required=False,
@@ -84,18 +84,35 @@ class ImportType(models.Model):
         default=True,
     )
     _sql_constraints = [
-        ("key_uniq", "unique (key)", _("Import type `key` must be unique!"))
+        ("key_uniq", "unique (key)", "Import type `key` must be unique!")
     ]
     # TODO: provide default source and configuration policy
     # for an import type to ease bootstrapping recordsets from UI.
     # default_source_model_id = fields.Many2one()
+
+    @api.constrains("options")
+    def _check_options(self):
+        no_options = self.browse()
+        for rec in self:
+            if not rec.options and not rec.settings:
+                no_options.append(rec)
+            # TODO: validate yaml schema (maybe w/ Cerberus?)
+        if no_options:
+            raise exceptions.UserError(
+                _("No options found for: {}.").format(
+                    ", ".join(no_options.mapped("name"))
+                )
+            )
+
+    def _load_options(self):
+        return yaml.safe_load(self.options or "") or []
 
     def available_importers(self):
         self.ensure_one()
         if self.settings:
             for item in self._legacy_available_importers():
                 yield item
-        options = yaml.safe_load(self.options or "") or []
+        options = self._load_options()
         for line in options:
             is_last_importer = False
             if line == options[-1]:
