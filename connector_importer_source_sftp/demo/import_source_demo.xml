@@ -6,7 +6,7 @@
         <field name="name">demo_source_sftp_csv</field>
         <field name="csv_delimiter">,</field>
         <field name="csv_encoding">utf-8</field>
-        <field name="storage_id" ref="storage_backend_sftp_demo" />
+        <field name="storage_id" ref="demo_storage_backend_sftp" />
         <field name="sftp_filename_pattern">.*\.csv$</field>
         <field name="move_file_after_import" eval="False" />
         <field name="sftp_path_input">input</field>
