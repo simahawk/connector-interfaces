@@ -4,12 +4,16 @@
 
 import logging
 
-import yaml
-
 from odoo import _, fields, models
 from odoo.tools import DotDict
 
 _logger = logging.getLogger(__name__)
+
+
+try:
+    import yaml
+except ImportError:
+    _logger.debug("`yaml` lib is missing")
 
 
 class ImportType(models.Model):

@@ -24,5 +24,5 @@
         "views/source_config_template.xml",
         "menuitems.xml",
     ],
-    "external_dependencies": {"python": ["chardet", "pytz"]},
+    "external_dependencies": {"python": ["chardet", "pytz", "pyyaml"]},
 }
