@@ -19,6 +19,7 @@ class SFTPSourceImportRecordsetEventListener(Component):
     @skip_if(lambda self, importer, record: self._skip_move_file(importer, record))
     def on_last_record_import_finished(self, importer, record):
         self._move_file(importer)
+        self._report_errors(importer)
 
     def _skip_move_file(self, importer, record):
         """Check if the file used for the import should be moved.
@@ -80,3 +81,14 @@ class SFTPSourceImportRecordsetEventListener(Component):
             "commit",
             functools.partial(move_func, [sftp_filepath], sftp_destination_path),
         )
+
+    def _report_errors(self, importer):
+        recordset = importer.recordset
+        source = recordset.get_source()
+        if not source.send_back_error_report or not self._move_file_to_error(importer):
+            return
+        recordset.generate_report()
+        csv_report = recordset.report_file
+        if csv_report:
+            filepath = source._sftp_filepath("error").replace(".csv", ".report.csv")
+            source.storage_id.add(filepath, csv_report, binary=False)

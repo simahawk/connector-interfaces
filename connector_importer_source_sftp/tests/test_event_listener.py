@@ -108,3 +108,25 @@ class TestRecordImporterFinishedEvent(SFTPSourceSavepointComponentRegistryCase):
         mocked_method.assert_called_with(
             self.source.storage_id._move_files, "input/filename.csv", "error"
         )
+
+    @mute_logger("[importer]")
+    @mock.patch(EVENT_LISTENER_PATH + "._add_after_commit_hook")
+    def test_importer_create_move_enabled_fail_error_report(self, mocked_method):
+        self.source.move_file_after_import = True
+        self.source.send_back_error_report = True
+        with mock.patch(
+            SOURCE_MODEL_PATH + "._sftp_get_file", self._sftp_get_file_patch
+        ):
+            chunk = tuple(self.source._get_lines())
+            self.record.set_data(chunk)
+            with mock.patch.object(type(self.source.storage_id), "add") as mocked_add:
+                self.record.with_context(
+                    _test_break_import="Ops, value XYZ is not valid"
+                ).run_import()
+            self._test_result({"created": 0, "errored": 5, "updated": 0, "skipped": 0})
+        mocked_method.assert_called_with(
+            self.source.storage_id._move_files, "input/filename.csv", "error"
+        )
+        mocked_add.assert_called_with(
+            "error/filename.report.csv", self.recordset.report_file, binary=False
+        )

@@ -29,6 +29,7 @@ class TestSourceCSV(SFTPSourceSavepointComponentCase):
         "move_file_after_import",
         "sftp_path_error",
         "sftp_path_success",
+        "send_back_error_report",
     ]
 
     @mute_logger("[importer]")

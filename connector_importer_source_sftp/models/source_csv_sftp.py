@@ -63,6 +63,10 @@ class ImportSourceCSVSFTP(models.Model):
         help="If enabled, the file processed will be moved to success/error folders "
         "depending on the result of the import"
     )
+    # TODO: this should probably stay at recordset level
+    send_back_error_report = fields.Boolean(
+        help="If enabled, the CSV report will be generated and put in the error folder"
+    )
 
     # FIXME: screws tests
     # @property
@@ -84,6 +88,7 @@ class ImportSourceCSVSFTP(models.Model):
                 "sftp_path_input",
                 "sftp_filename_pattern",
                 "move_file_after_import",
+                "send_back_error_report",
             ]
         )
         if self.move_file_after_import:
@@ -121,6 +126,6 @@ class ImportSourceCSVSFTP(models.Model):
     def _sftp_read_file(self, filepath):
         return self.storage_id._get_b64_data(filepath)
 
-    def _sftp_filepath(self):
-        base_path = (self.sftp_path_input or "").rstrip("/ ")
+    def _sftp_filepath(self, path_suffix="input"):
+        base_path = (self["sftp_path_" + path_suffix] or "").rstrip("/ ")
         return os.path.join(base_path, self.csv_filename.strip("/ "))

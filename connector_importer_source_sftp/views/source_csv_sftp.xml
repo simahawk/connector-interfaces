@@ -23,6 +23,7 @@
                         name="sftp_path_error"
                         attrs="{'invisible': [('move_file_after_import', '=', False)]}"
                     />
+                    <field name="send_back_error_report" />
                 </group>
             </group>
         </field>
