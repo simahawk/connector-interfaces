@@ -23,10 +23,12 @@ class TestRecordImporterFinishedEvent(SFTPSourceSavepointComponentRegistryCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.fake_lines = cls._fake_lines(cls, 10, keys=("id", "fullname"))
+        cls.recordset.write(
+            {"source_model": "import.source.csv.sftp", "source_id": cls.source.id}
+        )
 
     def setUp(self):
         super().setUp()
-        self._setup_components()
         # Not sure why but this write gets lost if done in setUpClass :/
         # Probably depends on server env override?
         # self.source.write(
@@ -36,9 +38,6 @@ class TestRecordImporterFinishedEvent(SFTPSourceSavepointComponentRegistryCase):
         #         "sftp_path_success": "success",
         #     }
         # )
-        self.recordset.write(
-            {"source_model": "import.source.csv.sftp", "source_id": self.source.id}
-        )
         self.record = self.env["import.record"].create(
             {"recordset_id": self.recordset.id}
         )
