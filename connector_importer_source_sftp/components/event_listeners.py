@@ -30,6 +30,8 @@ class SFTPSourceImportRecordsetEventListener(Component):
         if record.env.context.get("_sftp_skip_move_file"):
             return True
         source = importer.recordset.get_source()
+        if source._name != "import.source.csv.sftp":
+            return True
         return not source.move_file_after_import if source else True
 
     def _move_file(self, importer):
