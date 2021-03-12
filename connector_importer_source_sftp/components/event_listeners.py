@@ -93,4 +93,4 @@ class SFTPSourceImportRecordsetEventListener(Component):
         csv_report = recordset.report_file
         if csv_report:
             filepath = source._sftp_filepath("error").replace(".csv", ".report.csv")
-            source.storage_id.add(filepath, csv_report, binary=False)
+            source.storage_id._add_b64_data(filepath, csv_report)
